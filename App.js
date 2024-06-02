@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, View, Text, TextInput, TouchableOpacity, FlatList, Alert, Modal } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Player from './components/Player';
 import Navbar from './components/Navbar';
 
@@ -9,6 +10,33 @@ const App = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentPlayerId, setCurrentPlayerId] = useState(null);
   const [editedName, setEditedName] = useState('');
+
+  useEffect(() => {
+    loadPlayers();
+  }, []);
+
+  useEffect(() => {
+    savePlayers();
+  }, [players]);
+
+  const savePlayers = async () => {
+    try {
+      await AsyncStorage.setItem('players', JSON.stringify(players));
+    } catch (error) {
+      console.error('Failed to save players:', error);
+    }
+  };
+
+  const loadPlayers = async () => {
+    try {
+      const savedPlayers = await AsyncStorage.getItem('players');
+      if (savedPlayers) {
+        setPlayers(JSON.parse(savedPlayers));
+      }
+    } catch (error) {
+      console.error('Failed to load players:', error);
+    }
+  };
 
   const addPlayer = () => {
     if (playerName.trim() === '') {
@@ -162,6 +190,8 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 18,
+    textAlign:'center',
+
   },
   modalContainer: {
     flex: 1,
