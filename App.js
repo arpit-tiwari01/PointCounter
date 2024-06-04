@@ -3,6 +3,7 @@ import { SafeAreaView, StyleSheet, View, Text, TextInput, TouchableOpacity, Flat
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Player from './components/Player';
 import Navbar from './components/Navbar';
+import LongPressMenu from './components/LongPressMenu';
 
 const App = () => {
   const [players, setPlayers] = useState([]);
@@ -10,6 +11,7 @@ const App = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentPlayerId, setCurrentPlayerId] = useState(null);
   const [editedName, setEditedName] = useState('');
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
 
   useEffect(() => {
     loadPlayers();
@@ -66,25 +68,17 @@ const App = () => {
   };
 
   const handleLongPress = (id) => {
-    Alert.alert(
-      'Edit or Delete',
-      'Do you want to edit or delete this player?',
-      [
-        { text: 'Edit', onPress: () => editPlayer(id) },
-        { text: 'Delete', onPress: () => deletePlayer(id) },
-        { text: 'Cancel', style: 'cancel' }
-      ],
-      { cancelable: true }
-    );
+    setCurrentPlayerId(id);
+    setIsMenuVisible(true);
   };
 
-  const editPlayer = (id) => {
-    const player = players.find(player => player.id === id);
+  const editPlayer = () => {
+    const player = players.find(player => player.id === currentPlayerId);
     if (player) {
-      setCurrentPlayerId(id);
       setEditedName(player.name);
       setIsEditing(true);
     }
+    setIsMenuVisible(false);
   };
 
   const confirmEdit = () => {
@@ -96,13 +90,14 @@ const App = () => {
     setEditedName('');
   };
 
-  const deletePlayer = (id) => {
-    setPlayers(players.filter(player => player.id !== id));
+  const deletePlayer = () => {
+    setPlayers(players.filter(player => player.id !== currentPlayerId));
+    setIsMenuVisible(false);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Navbar title="Point Counter" />
+      <Navbar />
       <View style={styles.content}>
         <View style={styles.inputContainer}>
           <TextInput
@@ -132,6 +127,13 @@ const App = () => {
         <TouchableOpacity style={[styles.button, { backgroundColor: '#DC3545' }]} onPress={resetPoints}>
           <Text style={styles.buttonText}>Reset Points</Text>
         </TouchableOpacity>
+
+        <LongPressMenu 
+          isVisible={isMenuVisible} 
+          onClose={() => setIsMenuVisible(false)} 
+          onEdit={editPlayer} 
+          onDelete={deletePlayer} 
+        />
         
         <Modal
           visible={isEditing}
@@ -190,8 +192,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 18,
-    textAlign:'center',
-
+    textAlign: 'center',
   },
   modalContainer: {
     flex: 1,

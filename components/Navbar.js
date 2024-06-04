@@ -3,9 +3,8 @@ import { View, Text, StyleSheet, StatusBar } from 'react-native';
 
 const Navbar = ({ title }) => {
   return (
-    <View>
+    <View style={styles.container}>
       <StatusBar backgroundColor="#007BFF" barStyle="light-content" />
-      <View style={styles.statusBar} />
       <View style={styles.navbar}>
         <Text style={styles.navbarText}>{title}</Text>
       </View>
@@ -14,21 +13,19 @@ const Navbar = ({ title }) => {
 };
 
 const styles = StyleSheet.create({
-  statusBar: {
-    backgroundColor: '#007BFF',
-    // height: StatusBar.currentHeight,
-  },
-  navbar: {
+  container: {
     backgroundColor: '#007BFF',
     padding: 10,
     width: '100%',
     alignItems: 'center',
   },
+  navbar: {
+    // Removed background color to prevent hiding text
+  },
   navbarText: {
     color: 'white',
     fontSize: 20,
     fontWeight: 'bold',
-    
   },
 });
 
